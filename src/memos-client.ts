@@ -70,12 +70,12 @@ export class MemosClient {
   async getUserId(): Promise<string> {
     try {
       const userDetails = await this.getUser();
-      
+
       const userId = userDetails.name;
       if (!userId) {
         throw new MemosError('Could not retrieve user ID from user details');
       }
-      
+
       return userId;
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -88,9 +88,10 @@ export class MemosClient {
   /**
    * Search Memos
    * @param keyWord Search keyword
+   * @param state Filter by memo state (default is NORMAL, can also be ARCHIVED)
    * @returns List of Memos matching the criteria
    */
-  async searchMemos(keyWord: string): Promise<Memo[]> {
+  async searchMemos(keyWord: string, state: string): Promise<Memo[]> {
     try {
       // First get user ID
       const userId = await this.getUserId();
@@ -98,7 +99,7 @@ export class MemosClient {
       // Configure request parameters
       const params: Record<string, string | number> = {
         filter: `content.contains("${keyWord}")`,
-        pageSize: 20,
+        state: state,
       };
       
       // Send request

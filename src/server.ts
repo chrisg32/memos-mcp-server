@@ -59,15 +59,25 @@ server.addTool({
 // Register search Memos tool
 server.addTool({
   name: "search_memo",
-  description: "Search for memos",
+  description: "Search for memos. By default, no state selection is required unless specified by the user.",
   parameters: z.object({
     key_word: z.string().describe("The key words to search for in the memo content."),
+    state: z.enum(["NORMAL", "ARCHIVED"]).default("NORMAL").describe("The state of the memos to list."),
   }),
   execute: async (args) => {
     try {
-      const results = await memosClient.searchMemos(args.key_word);
-      const content = results.map(memo => memo.content).join(", ");
-      return `Search result:\n${content}`;
+      const results = await memosClient.searchMemos(args.key_word, args.state);
+      const memos = results.map(memo => ({
+        name: memo.name,
+        state: memo.state,
+        creator: memo.creator,
+        displayTime: memo.displayTime,
+        visibility: memo.visibility,
+        tags: memo.tags || [],
+        pinned: memo.pinned,
+        content: memo.content,
+      }));
+      return `Search results: ${JSON.stringify(memos)}`;
     } catch (error) {
       if (error instanceof MemosError) {
         throw new UserError(error.message);
