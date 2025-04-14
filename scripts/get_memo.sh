@@ -2,18 +2,17 @@
 
 # 載入環境變數
 source "$(dirname "$0")/setup.sh"
-
 # 檢查是否提供備忘錄 ID
 if [ -z "$1" ]; then
   echo "使用方法: $0 <備忘錄ID>"
-  echo "備忘錄ID 格式：數字 或 memos/數字"
+  echo "備忘錄ID 格式：memos/RVJPKdhmfgaXrrxUP8tj4v"
   exit 1
 fi
 
 # 格式化 ID
-if [[ "$1" =~ ^[0-9]+$ ]]; then
+if [[ "$1" =~ ^[a-zA-Z0-9]+$ ]]; then
   MEMO_ID="memos/$1"
-elif [[ "$1" =~ ^memos/[0-9]+$ ]]; then
+elif [[ "$1" =~ ^memos/[a-zA-Z0-9]+$ ]]; then
   MEMO_ID="$1"
 else
   echo "錯誤：無效的備忘錄 ID 格式"
