@@ -1,199 +1,95 @@
-# FastMCP Template
+# memos-mcp-server (TypeScript)
 
-A minimal template for publishing a Fast MCP project. This project provides a lightweight starting point for developing and publishing FastMCP servers.
+一個使用 [MCP(Model Context Protocol)](https://modelcontextprotocol.io) 協議的 [Memos](https://github.com/usememos/memos) 伺服器。
 
-## Purpose
+## 功能與工具
 
-This template was created as a minimal publishable FastMCP template. Since n8n mcp client and Cherry Studio can only use npx in a stateless manner, many Python MCP servers would benefit from being rewritten in JavaScript for better usability. This template serves as a starting point for such development.
+- `search_memo`: 使用關鍵字搜索 memos。
+- `create_memo`: 創建一條新的 memo。
+- `get_memo`: 獲取指定的 memo。
+- `list_memo_tags`: 列出所有 memo 標籤。
 
-## Features
+## 環境變數
 
-- Simple and minimal implementation
-- Ready to publish
-- Stateless design for compatibility with npx
-- TypeScript support
-- Easy to extend and customize
+- `MEMOS_URL`: Memos API 的 URL
+- `MEMOS_API_KEY`: Memos API 密鑰
+- `MEMOS_TIMEOUT`: API 請求超時時間（毫秒，默認為 15000）
 
-## Quick Start
+## 使用方法
 
-> For more detailed usage and advanced features, please visit the [FastMCP GitHub repository](https://github.com/punkpeye/fastmcp).
-
-To develop a new tool for your FastMCP server, follow these steps to modify the `src/server.ts` file:
-
-```ts
-# Original file content (starting code)
-#!/usr/bin/env node
-import { FastMCP, UserError } from "fastmcp";
-import { z } from "zod";
-
-const server = new FastMCP({
-  name: "FastMCP Minimal implementation",
-  version: "0.0.1",
-});
-
-server.addTool({
-  name: "add",
-  description: "Add two numbers",
-  parameters: z.object({
-    a: z.number(),
-    b: z.number(),
-  }),
-  execute: async (args) => {
-    if (false) {
-      throw new UserError("Error Message.");
-    }
-
-    return String(args.a + args.b);
-  },
-});
-
-server.start({
-  transportType: "stdio",
-});
-```
-
-Now, let's add a new tool! For example, you can add a random number generator tool:
-
-```diff
-#!/usr/bin/env node
-import { FastMCP, UserError } from "fastmcp";
-import { z } from "zod";
-
-const server = new FastMCP({
-  name: "FastMCP Minimal implementation",
-  version: "0.0.1",
-});
-
-server.addTool({
-  name: "add",
-  description: "Add two numbers",
-  parameters: z.object({
-    a: z.number(),
-    b: z.number(),
-  }),
-  execute: async (args) => {
-    if (false) {
-      throw new UserError("Error Message.");
-    }
-
-    return String(args.a + args.b);
-  },
-});
-
-+ // Add a new random number generator tool
-+ server.addTool({
-+   name: "random",
-+   description: "Generate a random number between min and max (inclusive)",
-+   parameters: z.object({
-+     min: z.number().default(0),
-+     max: z.number().default(100),
-+   }),
-+   execute: async (args) => {
-+     const min = Math.ceil(args.min);
-+     const max = Math.floor(args.max);
-+     const result = Math.floor(Math.random() * (max - min + 1)) + min;
-+     return String(result);
-+   },
-+ });
-
-server.start({
-  transportType: "stdio",
-});
-```
-
-For more comprehensive examples and advanced usage patterns, refer to the [FastMCP documentation](https://github.com/punkpeye/fastmcp).
-
-## Running Your Server
-
-### Development
+### 開發
 
 ```bash
+# 安裝依賴
+npm install
+
+# 創建 .env 文件並設置環境變數
+cp .env.example .env
+# 編輯 .env 文件
+
+# 運行開發伺服器
 npm run dev
 ```
 
-### Inspection
+### 構建
 
 ```bash
-npm run inspect
+npm run build
 ```
 
-### Production
+### 運行
 
 ```bash
-npm run start
+npm start
 ```
 
-## How to use with Claude Desktop?
+### 測試
 
-### Using the Published Package (Stateless Execution)
+```bash
+npm test
+```
 
-After publishing to npm, you can use the package in a stateless manner with npx:
+## MCP 客戶端配置
+
+將以下配置添加到您的 MCP 客戶端配置文件中：
 
 ```json
 {
   "mcpServers": {
-    "fastmcp-template": {
-      "command": "npx",
-      "args": [
-        "fastmcp-template"
-      ],
+    "memos": {
+      "command": "node",
+      "args": ["./dist/server.js"],
       "env": {
-        "NODE_ENV": "production"
+        "MEMOS_URL": "https://memos.example.com",
+        "MEMOS_API_KEY": "your_api_key",
+        "MEMOS_TIMEOUT": "15000"
       }
     }
   }
 }
 ```
 
-### Using a Local Development Version
+## 參數說明
 
-For local development or custom versions:
+### search_memo
 
-```json
-{
-  "mcpServers": {
-    "my-mcp-server": {
-      "command": "npx",
-      "args": [
-        "tsx",
-        "/PATH/TO/YOUR_PROJECT/src/server.ts"
-      ],
-      "env": {
-        "YOUR_ENV_VAR": "value"
-      }
-    }
-  }
-}
-```
+- `key_word`: 要搜索的關鍵字
 
-### Using from a Custom Registry
+### create_memo
 
-If you're using a private npm registry:
+- `content`: memo 內容
+- `visibility`: 可見性設置 (`PUBLIC`, `PROTECTED`, `PRIVATE`)
+- `tags`: 標籤列表
 
-```json
-{
-  "mcpServers": {
-    "fastmcp-template": {
-      "command": "npx",
-      "args": [
-        "--registry=https://your-private-registry.com",
-        "fastmcp-template"
-      ],
-      "env": {
-        "NODE_ENV": "production"
-      }
-    }
-  }
-}
-```
+### get_memo
 
-## Issues and Contributions
+- `name`: memo 名稱，格式為 `memos/{id}`
 
-If you encounter any issues or would like to contribute to this project, please visit our [GitHub repository](https://github.com/stephen9412/fastmcp-template).
+### list_memo_tags
 
-- Report issues: [https://github.com/stephen9412/fastmcp-template/issues]
-- Submit contributions: Create a pull request on our GitHub repository
+- `parent`: 父級資源，格式為 `memos/{id}`，默認為 `memos/-`
+- `visibility`: 可見性過濾 (`PUBLIC`, `PROTECTED`, `PRIVATE`)
 
-## License
+## 許可證
 
 MIT
