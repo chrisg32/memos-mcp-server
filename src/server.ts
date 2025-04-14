@@ -115,12 +115,12 @@ server.addTool({
   name: "get_memo",
   description: "Get a memo",
   parameters: z.object({
-    name: z.string().describe("The name of the memo. Format: memos/{id}"),
+    name: z.string().describe("The name of the memo."),
   }),
   execute: async (args) => {
     try {
-      const result = await memosClient.getMemo(args.name);
-      return `Memo:\n${result.content}`;
+      const memo = await memosClient.getMemo(args.name);
+      return `Memo: ${JSON.stringify(memo)}`;
     } catch (error) {
       if (error instanceof MemosError) {
         throw new UserError(error.message);
