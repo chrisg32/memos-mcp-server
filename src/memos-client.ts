@@ -2,8 +2,8 @@ import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
 import { Memo, MemosError, MemoTagsResponse, SearchMemosResponse, UserStatus, Visibility } from './types.js';
 
 /**
- * Memos 客戶端類
- * 用於與 Memos API 進行交互
+ * Memos Client Class
+ * Used for interacting with Memos API
  */
 export class MemosClient {
   private client: AxiosInstance;
@@ -12,10 +12,10 @@ export class MemosClient {
   private timeout: number;
 
   /**
-   * 初始化 Memos 客戶端
+   * Initialize Memos client
    * @param memosUrl Memos API URL
    * @param memosApiKey Memos API Key
-   * @param timeout 請求超時時間（毫秒）
+   * @param timeout Request timeout (milliseconds)
    */
   constructor(memosUrl: string, memosApiKey: string, timeout: number = 15000) {
     if (!memosUrl) {
@@ -30,7 +30,7 @@ export class MemosClient {
     this.apiKey = memosApiKey;
     this.timeout = timeout;
 
-    // 創建 axios 實例
+    // Create axios instance
     this.client = axios.create({
       baseURL: this.url,
       timeout: this.timeout,
@@ -43,8 +43,8 @@ export class MemosClient {
   }
 
   /**
-   * 通過驗證狀態獲取用戶 ID
-   * @returns 用戶 ID
+   * Get user ID through authentication status
+   * @returns User ID
    */
   async getUserId(): Promise<string> {
     try {
@@ -65,22 +65,22 @@ export class MemosClient {
   }
 
   /**
-   * 搜索 Memo
-   * @param keyWord 搜索關鍵詞
-   * @returns 符合條件的 Memo 列表
+   * Search Memos
+   * @param keyWord Search keyword
+   * @returns List of Memos matching the criteria
    */
   async searchMemos(keyWord: string): Promise<Memo[]> {
     try {
-      // 首先獲取用戶 ID
+      // First get user ID
       const userId = await this.getUserId();
       
-      // 配置請求參數
+      // Configure request parameters
       const params: Record<string, string | number> = {
         filter: `content.contains("${keyWord}")`,
         pageSize: 20,
       };
       
-      // 發送請求
+      // Send request
       const response = await this.client.get<SearchMemosResponse>(
         `/api/v1/${userId}/memos`,
         { params }
@@ -96,28 +96,28 @@ export class MemosClient {
   }
 
   /**
-   * 創建新的 Memo
-   * @param content Memo 內容
-   * @param tags 標籤列表
-   * @param visibility 可見性設置
-   * @returns 創建的 Memo 對象
+   * Create new Memo
+   * @param content Memo content
+   * @param tags List of tags
+   * @param visibility Visibility settings
+   * @returns Created Memo object
    */
   async createMemo(content: string, tags: string[] = [], visibility: Visibility = Visibility.PRIVATE): Promise<Memo> {
     try {
-      // 格式化內容，包含標籤
+      // Format content, including tags
       let formattedContent = content;
       if (tags.length > 0) {
-        // 在內容末尾添加標籤
+        // Add tags at the end of content
         formattedContent += '\n\n' + tags.join(' ');
       }
       
-      // 準備請求負載
+      // Prepare request payload
       const payload = {
         content: formattedContent,
         visibility: visibility,
       };
       
-      // 發送請求
+      // Send request
       const response = await this.client.post<Memo>(
         '/api/v1/memos',
         payload
@@ -133,16 +133,16 @@ export class MemosClient {
   }
 
   /**
-   * 獲取指定的 Memo
+   * Get specified Memo
    * @param memoId Memo ID
-   * @returns Memo 對象
+   * @returns Memo object
    */
   async getMemo(memoId: string): Promise<Memo> {
     try {
-      // 格式化名稱
+      // Format name
       const name = memoId.startsWith('memos/') ? memoId : `memos/${memoId}`;
       
-      // 發送請求
+      // Send request
       const response = await this.client.get<Memo>(`/api/v1/${name}`);
       return response.data;
     } catch (error) {
@@ -154,19 +154,19 @@ export class MemosClient {
   }
 
   /**
-   * 列出所有 Memo 標籤
-   * @param parent 父級資源（默認為 "memos/-"）
-   * @param visibility 可見性過濾
-   * @returns 標籤列表及其使用次數
+   * List all Memo tags
+   * @param parent Parent resource (default is "memos/-")
+   * @param visibility Visibility filter
+   * @returns List of tags and their usage count
    */
   async listMemoTags(parent: string = 'memos/-', visibility: Visibility = Visibility.PRIVATE): Promise<Record<string, number>> {
     try {
-      // 配置請求參數
+      // Configure request parameters
       const params: Record<string, string> = {
         filter: `visibilities == ["${visibility}"]`,
       };
       
-      // 發送請求
+      // Send request
       const response = await this.client.get<MemoTagsResponse>(
         `/api/v1/${parent}/tags`,
         { params }

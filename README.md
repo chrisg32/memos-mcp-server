@@ -1,57 +1,57 @@
 # memos-mcp-server (TypeScript)
 
-一個使用 [MCP(Model Context Protocol)](https://modelcontextprotocol.io) 協議的 [Memos](https://github.com/usememos/memos) 伺服器。
+A [Memos](https://github.com/usememos/memos) server using the [MCP (Model Context Protocol)](https://modelcontextprotocol.io) protocol.
 
-## 功能與工具
+## Features and Tools
 
-- `search_memo`: 使用關鍵字搜索 memos。
-- `create_memo`: 創建一條新的 memo。
-- `get_memo`: 獲取指定的 memo。
-- `list_memo_tags`: 列出所有 memo 標籤。
+- `search_memo`: Search memos using keywords.
+- `create_memo`: Create a new memo.
+- `get_memo`: Get a specific memo.
+- `list_memo_tags`: List all memo tags.
 
-## 環境變數
+## Environment Variables
 
-- `MEMOS_URL`: Memos API 的 URL
-- `MEMOS_API_KEY`: Memos API 密鑰
-- `MEMOS_TIMEOUT`: API 請求超時時間（毫秒，默認為 15000）
+- `MEMOS_URL`: URL of the Memos API
+- `MEMOS_API_KEY`: Memos API key
+- `MEMOS_TIMEOUT`: API request timeout (milliseconds, default is 15000)
 
-## 使用方法
+## Usage
 
-### 開發
+### Development
 
 ```bash
-# 安裝依賴
+# Install dependencies
 npm install
 
-# 創建 .env 文件並設置環境變數
+# Create .env file and set environment variables
 cp .env.example .env
-# 編輯 .env 文件
+# Edit .env file
 
-# 運行開發伺服器
+# Run development server
 npm run dev
 ```
 
-### 構建
+### Build
 
 ```bash
 npm run build
 ```
 
-### 運行
+### Run
 
 ```bash
 npm start
 ```
 
-### 測試
+### Test
 
 ```bash
 npm test
 ```
 
-## MCP 客戶端配置
+## MCP Client Configuration
 
-將以下配置添加到您的 MCP 客戶端配置文件中：
+Add the following configuration to your MCP client configuration file:
 
 ```json
 {
@@ -69,27 +69,27 @@ npm test
 }
 ```
 
-## 參數說明
+## Parameter Descriptions
 
 ### search_memo
 
-- `key_word`: 要搜索的關鍵字
+- `key_word`: Keyword to search for
 
 ### create_memo
 
-- `content`: memo 內容
-- `visibility`: 可見性設置 (`PUBLIC`, `PROTECTED`, `PRIVATE`)
-- `tags`: 標籤列表
+- `content`: Memo content
+- `visibility`: Visibility setting (`PUBLIC`, `PROTECTED`, `PRIVATE`)
+- `tags`: List of tags
 
 ### get_memo
 
-- `name`: memo 名稱，格式為 `memos/{id}`
+- `name`: Memo name, format is `memos/{id}`
 
 ### list_memo_tags
 
-- `parent`: 父級資源，格式為 `memos/{id}`，默認為 `memos/-`
-- `visibility`: 可見性過濾 (`PUBLIC`, `PROTECTED`, `PRIVATE`)
+- `parent`: Parent resource, format is `memos/{id}`, default is `memos/-`
+- `visibility`: Visibility filter (`PUBLIC`, `PROTECTED`, `PRIVATE`)
 
-## 許可證
+## License
 
 MIT

@@ -1,9 +1,9 @@
 /**
- * Memos MCP 伺服器類型定義
+ * Memos MCP Server Type Definitions
  */
 
 /**
- * 可見性枚舉
+ * Visibility Enum
  */
 export enum Visibility {
   PUBLIC = 'PUBLIC',
@@ -12,7 +12,7 @@ export enum Visibility {
 }
 
 /**
- * Memos API 錯誤類型
+ * Memos API Error Type
  */
 export class MemosError extends Error {
   constructor(message: string) {
@@ -22,7 +22,7 @@ export class MemosError extends Error {
 }
 
 /**
- * Memo 物件介面
+ * Memo Object Interface
  */
 export interface Memo {
   id: string;
@@ -38,28 +38,28 @@ export interface Memo {
 }
 
 /**
- * Memo 標籤結構
+ * Memo Tag Structure
  */
 export interface TagAmount {
   [tag: string]: number;
 }
 
 /**
- * Memo 標籤響應
+ * Memo Tags Response
  */
 export interface MemoTagsResponse {
   tagAmounts: TagAmount;
 }
 
 /**
- * Memo 搜尋結果介面
+ * Memo Search Results Interface
  */
 export interface SearchMemosResponse {
   memos: Memo[];
 }
 
 /**
- * 使用者狀態介面
+ * User Status Interface
  */
 export interface UserStatus {
   name: string;

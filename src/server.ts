@@ -5,15 +5,15 @@ import { MemosClient } from "./memos-client.js";
 import { MemosError, Visibility } from "./types.js";
 import dotenv from 'dotenv';
 
-// 載入環境變數
+// Load environment variables
 dotenv.config();
 
-// 常量定義
+// Constants definition
 const MEMOS_URL = process.env.MEMOS_URL;
 const MEMOS_API_KEY = process.env.MEMOS_API_KEY;
 const MEMOS_TIMEOUT = process.env.MEMOS_TIMEOUT ? parseInt(process.env.MEMOS_TIMEOUT) : 15000;
 
-// 檢查必要的環境變數
+// Check required environment variables
 if (!MEMOS_URL) {
   console.error("Error: MEMOS_URL environment variable is required");
   process.exit(1);
@@ -24,13 +24,13 @@ if (!MEMOS_API_KEY) {
   process.exit(1);
 }
 
-// 初始化 FastMCP 伺服器
+// Initialize FastMCP server
 const server = new FastMCP({
   name: "memos-mcp-server",
   version: "0.1.0",
 });
 
-// 初始化 Memos 客戶端
+// Initialize Memos client
 let memosClient: MemosClient;
 try {
   memosClient = new MemosClient(MEMOS_URL, MEMOS_API_KEY, MEMOS_TIMEOUT);
@@ -39,7 +39,7 @@ try {
   process.exit(1);
 }
 
-// 註冊搜索 Memos 工具
+// Register search Memos tool
 server.addTool({
   name: "search_memo",
   description: "Search for memos",
@@ -60,7 +60,7 @@ server.addTool({
   },
 });
 
-// 註冊創建 Memo 工具
+// Register create Memo tool
 server.addTool({
   name: "create_memo",
   description: "Create a new memo",
@@ -83,7 +83,7 @@ server.addTool({
   },
 });
 
-// 註冊獲取 Memo 工具
+// Register get Memo tool
 server.addTool({
   name: "get_memo",
   description: "Get a memo",
@@ -103,7 +103,7 @@ server.addTool({
   },
 });
 
-// 註冊列出 Memo 標籤工具
+// Register list Memo tags tool
 server.addTool({
   name: "list_memo_tags",
   description: "List all existing memo tags",
@@ -126,12 +126,12 @@ server.addTool({
   },
 });
 
-// 啟動伺服器
+// Start server
 server.start({
   transportType: "stdio",
 });
 
-// 處理未捕獲的異常
+// Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
   console.error(`Uncaught exception: ${error.message}`);
   process.exit(1);
