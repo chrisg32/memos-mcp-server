@@ -174,32 +174,4 @@ export class MemosClient {
       throw new MemosError(`Error getting memo: ${String(error)}`);
     }
   }
-
-  /**
-   * List all Memo tags
-   * @param parent Parent resource (default is "memos/-")
-   * @param visibility Visibility filter
-   * @returns List of tags and their usage count
-   */
-  async listMemoTags(parent: string = 'memos/-', visibility: Visibility = Visibility.PRIVATE): Promise<Record<string, number>> {
-    try {
-      // Configure request parameters
-      const params: Record<string, string> = {
-        filter: `visibilities == ["${visibility}"]`,
-      };
-      
-      // Send request
-      const response = await this.client.get<MemoTagsResponse>(
-        `/api/v1/${parent}/tags`,
-        { params }
-      );
-      
-      return response.data.tagAmounts || {};
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new MemosError(`Error listing memo tags: ${error.message}`);
-      }
-      throw new MemosError(`Error listing memo tags: ${String(error)}`);
-    }
-  }
 }

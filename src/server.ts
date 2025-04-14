@@ -130,29 +130,6 @@ server.addTool({
   },
 });
 
-// Register list Memo tags tool
-server.addTool({
-  name: "list_memo_tags",
-  description: "List all existing memo tags",
-  parameters: z.object({
-    parent: z.string().default("memos/-").describe("The parent, who owns the tags. Format: memos/{id}. Use \"memos/-\" to list all tags."),
-    visibility: z.enum(["PUBLIC", "PROTECTED", "PRIVATE"]).default("PRIVATE").describe("The visibility of the tags."),
-  }),
-  execute: async (args) => {
-    try {
-      const visibility = args.visibility as Visibility;
-      const result = await memosClient.listMemoTags(args.parent, visibility);
-      const tags = Object.keys(result).join(", ");
-      return `Tags:\n${tags}`;
-    } catch (error) {
-      if (error instanceof MemosError) {
-        throw new UserError(error.message);
-      }
-      throw new UserError(`Error listing memo tags: ${String(error)}`);
-    }
-  },
-});
-
 // Start server
 server.start({
   transportType: "stdio",
