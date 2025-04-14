@@ -9,20 +9,10 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // Constants definition
-const MEMOS_URL = process.env.MEMOS_URL;
-const MEMOS_API_KEY = process.env.MEMOS_API_KEY;
+const MEMOS_URL = process.env.MEMOS_URL || '';
+const MEMOS_API_KEY = process.env.MEMOS_API_KEY || '';
 const MEMOS_TIMEOUT = process.env.MEMOS_TIMEOUT ? parseInt(process.env.MEMOS_TIMEOUT) : 15000;
 
-// Check required environment variables
-if (!MEMOS_URL) {
-  console.error("Error: MEMOS_URL environment variable is required");
-  process.exit(1);
-}
-
-if (!MEMOS_API_KEY) {
-  console.error("Error: MEMOS_API_KEY environment variable is required");
-  process.exit(1);
-}
 
 // Initialize FastMCP server
 const server = new FastMCP({
@@ -130,10 +120,19 @@ server.addTool({
   },
 });
 
-// Start server
-server.start({
-  transportType: "stdio",
-});
+// Check connection to Memos server
+(async () => {
+  try {
+    // Testing connection to Memos server
+    await memosClient.getUser();
+    server.start({
+      transportType: "stdio",
+    });
+  } catch (error) {
+    console.error(`Error connecting to Memos server: ${error instanceof Error ? error.message : String(error)}`);
+    process.exit(1);
+  }
+})();
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (error) => {
