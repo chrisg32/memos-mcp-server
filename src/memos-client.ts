@@ -43,16 +43,37 @@ export class MemosClient {
   }
 
   /**
+   * Get user details through authentication status
+   * @returns User details
+   */
+  async getUser(): Promise<UserStatus> {
+    try {
+      const response = await this.client.post<UserStatus>('/api/v1/auth/status');
+      
+      if (!response.data) {
+        throw new MemosError('Could not retrieve user details from auth status');
+      }
+      
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new MemosError(`Error getting user details: ${error.message}`);
+      }
+      throw new MemosError(`Error getting user details: ${String(error)}`);
+    }
+  }
+
+  /**
    * Get user ID through authentication status
    * @returns User ID
    */
   async getUserId(): Promise<string> {
     try {
-      const response = await this.client.post<UserStatus>('/api/v1/auth/status');
+      const userDetails = await this.getUser();
       
-      const userId = response.data.name;
+      const userId = userDetails.name;
       if (!userId) {
-        throw new MemosError('Could not retrieve user ID from auth status');
+        throw new MemosError('Could not retrieve user ID from user details');
       }
       
       return userId;

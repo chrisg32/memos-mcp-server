@@ -39,6 +39,23 @@ try {
   process.exit(1);
 }
 
+server.addTool({
+  name: "get_user",
+  description: "Get user information",
+  parameters: z.object({}),
+  execute: async () => {
+    try {
+      const user = await memosClient.getUser();
+      return `User: ${JSON.stringify(user)}`;
+    } catch (error) {
+      if (error instanceof MemosError) {
+        throw new UserError(error.message);
+      }
+      throw new UserError(`Error retrieving user details: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  },
+});
+
 // Register search Memos tool
 server.addTool({
   name: "search_memo",
