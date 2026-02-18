@@ -103,17 +103,19 @@ server.addTool({
   },
 });
 
-// Check connection to Memos server
+// Start MCP server immediately, check connection in the background
+server.start({
+  transportType: "stdio",
+});
+
+// Verify connection to Memos server (non-fatal)
 (async () => {
   try {
-    // Testing connection to Memos server
     await memosClient.checkConnection();
-    server.start({
-      transportType: "stdio",
-    });
+    console.error("Connected to Memos server successfully.");
   } catch (error) {
-    console.error(`Error connecting to Memos server: ${error instanceof Error ? error.message : String(error)}`);
-    process.exit(1);
+    console.error(`Warning: Could not connect to Memos server: ${error instanceof Error ? error.message : String(error)}`);
+    console.error("The server will continue running. Tool calls will fail until Memos is reachable.");
   }
 })();
 
