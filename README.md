@@ -7,7 +7,6 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io) server for int
 - Search memos using keywords
 - Create new memos with customizable visibility settings and tags
 - Retrieve specific memos by ID
-- Get user information
 
 ## 🚀 Installation
 
@@ -64,10 +63,6 @@ Retrieve a specific memo by its ID.
 **Parameters:**
 
 - `name` (string): Memo name, format is `memos/{id}` or just the ID number
-
-### get_user
-
-Get current user information.
 
 ## 🧪 Development
 
