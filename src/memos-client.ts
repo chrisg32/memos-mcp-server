@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Memo, MemosError, MemoTagsResponse, SearchMemosResponse, UserStatus, Visibility } from './types.js';
+import { Memo, MemosError, SearchMemosResponse, Visibility } from './types.js';
 
 /**
  * Memos Client Class
@@ -43,45 +43,16 @@ export class MemosClient {
   }
 
   /**
-   * Get user details through authentication status
-   * @returns User details
+   * Verify connection to Memos server by listing memos with a small page size
    */
-  async getUser(): Promise<UserStatus> {
+  async checkConnection(): Promise<void> {
     try {
-      const response = await this.client.post<UserStatus>('/api/v1/auth/status');
-      
-      if (!response.data) {
-        throw new MemosError('Could not retrieve user details from auth status');
-      }
-      
-      return response.data;
+      await this.client.get('/api/v1/memos', { params: { pageSize: 1 } });
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        throw new MemosError(`Error getting user details: ${error.message}`);
+        throw new MemosError(`Error connecting to Memos server: ${error.message}`);
       }
-      throw new MemosError(`Error getting user details: ${String(error)}`);
-    }
-  }
-
-  /**
-   * Get user ID through authentication status
-   * @returns User ID
-   */
-  async getUserId(): Promise<string> {
-    try {
-      const userDetails = await this.getUser();
-
-      const userId = userDetails.name;
-      if (!userId) {
-        throw new MemosError('Could not retrieve user ID from user details');
-      }
-
-      return userId;
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        throw new MemosError(`Error getting user ID: ${error.message}`);
-      }
-      throw new MemosError(`Error getting user ID: ${String(error)}`);
+      throw new MemosError(`Error connecting to Memos server: ${String(error)}`);
     }
   }
 
@@ -93,21 +64,18 @@ export class MemosClient {
    */
   async searchMemos(keyWord: string, state: string): Promise<Memo[]> {
     try {
-      // First get user ID
-      const userId = await this.getUserId();
-      
       // Configure request parameters
       const params: Record<string, string | number> = {
         filter: `content.contains("${keyWord}")`,
         state: state,
       };
-      
-      // Send request
+
+      // Send request — v0.26+ uses /api/v1/memos directly
       const response = await this.client.get<SearchMemosResponse>(
-        `/api/v1/${userId}/memos`,
+        '/api/v1/memos',
         { params }
       );
-      
+
       return response.data.memos || [];
     } catch (error) {
       if (axios.isAxiosError(error)) {
