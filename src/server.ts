@@ -60,6 +60,64 @@ server.addTool({
   },
 });
 
+// Register list Memos tool
+server.addTool({
+  name: "list_memos",
+  description: "List memos sorted by display time (most recent first). Supports pagination.",
+  parameters: z.object({
+    limit: z.number().default(10).describe("Maximum number of memos to return (default 10)."),
+    offset: z.number().default(0).describe("Number of memos to skip for pagination (default 0)."),
+  }),
+  execute: async (args) => {
+    try {
+      // The Memos API uses cursor-based pagination with pageToken.
+      // To support offset-based pagination, we skip pages until we reach the desired offset.
+      const pageSize = args.limit;
+      let pageToken: string | undefined;
+      let skipped = 0;
+
+      // Skip pages to reach the desired offset
+      while (skipped < args.offset) {
+        const skipSize = Math.min(args.offset - skipped, 50);
+        const skipResult = await memosClient.listMemos(skipSize, pageToken);
+        skipped += skipResult.memos.length;
+        pageToken = skipResult.nextPageToken || undefined;
+        // If no more pages, break early
+        if (!pageToken || skipResult.memos.length === 0) {
+          break;
+        }
+      }
+
+      const result = await memosClient.listMemos(pageSize, pageToken);
+
+      // Sort by displayTime descending (most recent first)
+      const sortedMemos = result.memos.sort((a, b) => {
+        const timeA = new Date(a.displayTime || 0).getTime();
+        const timeB = new Date(b.displayTime || 0).getTime();
+        return timeB - timeA;
+      });
+
+      const memos = sortedMemos.map(memo => ({
+        name: memo.name,
+        state: memo.state,
+        creator: memo.creator,
+        displayTime: memo.displayTime,
+        visibility: memo.visibility,
+        tags: memo.tags || [],
+        pinned: memo.pinned,
+        content: memo.content,
+      }));
+
+      return `Memos (${memos.length} results): ${JSON.stringify(memos)}`;
+    } catch (error) {
+      if (error instanceof MemosError) {
+        throw new UserError(error.message);
+      }
+      throw new UserError(`Error listing memos: ${String(error)}`);
+    }
+  },
+});
+
 // Register create Memo tool
 server.addTool({
   name: "create_memo",

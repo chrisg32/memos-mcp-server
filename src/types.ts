@@ -59,6 +59,14 @@ export interface SearchMemosResponse {
 }
 
 /**
+ * Memo List Results Interface
+ */
+export interface ListMemosResponse {
+  memos: Memo[];
+  nextPageToken: string;
+}
+
+/**
  * User Status Interface
  */
 export interface UserStatus {

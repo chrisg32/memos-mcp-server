@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { Memo, MemosError, SearchMemosResponse, Visibility } from './types.js';
+import { Memo, MemosError, SearchMemosResponse, ListMemosResponse, Visibility } from './types.js';
 
 /**
  * Memos Client Class
@@ -82,6 +82,41 @@ export class MemosClient {
         throw new MemosError(`Error searching memos: ${error.message}`);
       }
       throw new MemosError(`Error searching memos: ${String(error)}`);
+    }
+  }
+
+  /**
+   * List Memos
+   * @param pageSize Maximum number of memos to return
+   * @param pageToken Token for cursor-based pagination
+   * @returns List of Memos and next page token
+   */
+  async listMemos(pageSize: number = 10, pageToken?: string): Promise<ListMemosResponse> {
+    try {
+      // Configure request parameters
+      const params: Record<string, string | number> = {
+        pageSize: pageSize,
+      };
+
+      if (pageToken) {
+        params.pageToken = pageToken;
+      }
+
+      // Send request
+      const response = await this.client.get<ListMemosResponse>(
+        '/api/v1/memos',
+        { params }
+      );
+
+      return {
+        memos: response.data.memos || [],
+        nextPageToken: response.data.nextPageToken || '',
+      };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        throw new MemosError(`Error listing memos: ${error.message}`);
+      }
+      throw new MemosError(`Error listing memos: ${String(error)}`);
     }
   }
 
